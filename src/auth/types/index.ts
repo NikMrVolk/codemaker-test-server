@@ -21,7 +21,7 @@ type LoginUserResponse = {
   login: string;
 };
 
-type LoginSuccessResponse = {
+export type LoginSuccessResponse = {
   casino: LoginCasinoResponse;
   db: LoginDBResponse;
   user: LoginUserResponse;

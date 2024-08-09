@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { AuthModule } from './auth/auth.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       ttl: 30 * 1000,
     }),
     AuthModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
