@@ -30,7 +30,7 @@ export class UsersService {
 
       try {
         const query = `
-        SELECT id, login, group, status, currency, balance, bonus_balance, date_reg
+        SELECT id, login, \`group\`, status, currency, balance, bonus_balance, date_reg
         FROM users
         ORDER BY ${sort.field} ${sort.direction}
         LIMIT 10
