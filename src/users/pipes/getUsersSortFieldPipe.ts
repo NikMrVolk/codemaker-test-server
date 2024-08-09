@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
-import { User } from '../types';
+import { Currency, User } from '../types';
 
 const userFieldNames: User = {
   id: 0,
   login: '',
   group: 1,
   status: 1,
-  currency: '',
+  currency: Currency.RUB,
   balance: 0,
   bonus_balance: 0,
   date_reg: new Date().toISOString(),
@@ -19,6 +19,9 @@ export class GetUsersSortFieldPipe implements PipeTransform {
   async transform(value: {
     sortField: keyof User;
     sortDirection: 'asc' | 'desc';
+    searchGroup?: string;
+    searchStatus?: string;
+    searchCurrency?: string;
   }) {
     const { sortField, sortDirection } = value;
 

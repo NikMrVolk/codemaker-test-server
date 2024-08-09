@@ -17,6 +17,11 @@ export class UsersService {
       field: 'id',
       direction: 'asc',
     },
+    searchQuery: {
+      group?: string;
+      status?: string;
+      currency?: string;
+    } = {},
   ) {
     const data = await this.cacheManager.get<LoginSuccessResponse>('2');
     if (data) {
@@ -28,15 +33,45 @@ export class UsersService {
         database: data.db.database,
       });
 
+      console.log(searchQuery);
+
       try {
-        const query = `
+        const queryConditions: string[] = [];
+
+        if (searchQuery.group) {
+          const groupValues = searchQuery.group.split(' ');
+          queryConditions.push(
+            `group IN (${groupValues.map((value) => `'${value}'`).join(', ')})`,
+          );
+        }
+
+        if (searchQuery.status) {
+          const statusValues = searchQuery.status.split(' ');
+          queryConditions.push(
+            `status IN (${statusValues.map((value) => `'${value}'`).join(', ')})`,
+          );
+        }
+
+        if (searchQuery.currency) {
+          const currencyValues = searchQuery.currency.split(' ');
+          queryConditions.push(
+            `currency IN (${currencyValues.map((value) => `'${value}'`).join(', ')})`,
+          );
+        }
+
+        const queryConditionString = queryConditions.join(' AND ');
+
+        const querySQL = `
         SELECT id, login, \`group\`, status, currency, balance, bonus_balance, date_reg
         FROM users
+        ${queryConditionString ? `WHERE ${queryConditionString}` : ''}
         ORDER BY ${sort.field} ${sort.direction}
         LIMIT 10
       `;
 
-        const users = await db.query<UsersResponse>(query);
+        console.log(querySQL);
+
+        const users = await db.query<UsersResponse>(querySQL);
 
         console.log(users);
 

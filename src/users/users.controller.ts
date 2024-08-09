@@ -13,6 +13,9 @@ export class UsersController {
     query: {
       sortField: keyof User;
       sortDirection: 'asc' | 'desc';
+      searchGroup: string;
+      searchStatus: string;
+      searchCurrency: string;
     },
   ) {
     const sort = {
@@ -20,6 +23,12 @@ export class UsersController {
       direction: query.sortDirection || 'desc',
     };
 
-    return this.usersService.getUsers(sort);
+    const search = {
+      group: query.searchGroup,
+      status: query.searchStatus,
+      currency: query.searchCurrency,
+    };
+
+    return this.usersService.getUsers(sort, search);
   }
 }

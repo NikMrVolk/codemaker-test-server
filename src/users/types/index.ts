@@ -1,9 +1,15 @@
+export enum Currency {
+  RUB = 'RUB',
+  USD = 'USD',
+  EUR = 'EUR',
+}
+
 export type User = {
   id: number;
   login: string;
   group: number;
   status: number;
-  currency: string;
+  currency: Currency;
   balance: number;
   bonus_balance: number;
   date_reg: string;
