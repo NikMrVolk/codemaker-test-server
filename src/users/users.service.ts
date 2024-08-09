@@ -25,7 +25,7 @@ export class UsersService {
 
       try {
         const query =
-          'SELECT id, login, group, status, currency, balance, bonus_balance, date_reg FROM users LIMIT 10';
+          'SELECT id, login, `group`, status, currency, balance, bonus_balance, date_reg FROM users LIMIT 10';
 
         const users = db.query<UsersResponse>(query);
 
