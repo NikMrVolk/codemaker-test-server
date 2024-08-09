@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { LoginSuccessResponse } from 'src/auth/types';
-import { UsersResponse } from './types';
+import { User, UsersResponse } from './types';
 import { DBService } from './db.service';
 
 @Injectable()
@@ -12,7 +12,12 @@ export class UsersService {
     private readonly dbService: DBService,
   ) {}
 
-  async getUsers() {
+  async getUsers(
+    sort: { field: keyof User; direction: 'asc' | 'desc' } = {
+      field: 'id',
+      direction: 'asc',
+    },
+  ) {
     const data = await this.cacheManager.get<LoginSuccessResponse>('2');
     if (data) {
       const db = await this.dbService.connectToDatabase({
@@ -24,8 +29,12 @@ export class UsersService {
       });
 
       try {
-        const query =
-          'SELECT id, login, `group`, status, currency, balance, bonus_balance, date_reg FROM users LIMIT 10';
+        const query = `
+        SELECT id, login, group, status, currency, balance, bonus_balance, date_reg
+        FROM users
+        ORDER BY ${sort.field} ${sort.direction}
+        LIMIT 10
+      `;
 
         const users = db.query<UsersResponse>(query);
 
