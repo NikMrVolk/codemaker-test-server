@@ -64,7 +64,7 @@ export class UsersService {
         const querySQL = `
         SELECT id, login, \`group\`, status, currency, balance, bonus_balance, date_reg
         FROM users
-        ${queryConditionString ? `WHERE ${queryConditionString}` : ''}
+        ${queryConditionString ? `WHERE ${queryConditionString.replace('group', '`group`')}` : ''}
         ORDER BY ${sort.field} ${sort.direction}
         LIMIT 10
       `;
