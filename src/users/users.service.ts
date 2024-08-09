@@ -36,7 +36,7 @@ export class UsersService {
         LIMIT 10
       `;
 
-        const users = db.query<UsersResponse>(query);
+        const users = await db.query<UsersResponse>(query);
 
         console.log(users);
 

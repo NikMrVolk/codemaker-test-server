@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { GetUsersSortFieldPipe } from './pipes/getUsersSortFieldPipe';
 import { User } from './types';
 
 @Controller('users')
@@ -8,13 +9,17 @@ export class UsersController {
 
   @Get()
   async getUsers(
-    @Query('sortField') sortField: keyof User,
-    @Query('sortDirection') sortDirection: 'asc' | 'desc',
+    @Query(GetUsersSortFieldPipe)
+    query: {
+      sortField: keyof User;
+      sortDirection: 'asc' | 'desc';
+    },
   ) {
     const sort = {
-      field: sortField || 'id',
-      direction: sortDirection || 'desc',
+      field: query.sortField || 'id',
+      direction: query.sortDirection || 'desc',
     };
+
     return this.usersService.getUsers(sort);
   }
 }
