@@ -87,8 +87,8 @@ export class UsersService {
 
     Object.keys(searchQuery).forEach((key) => {
       const value = searchQuery[key];
-      if (value) {
-        const values = searchQuery[key].split(' ');
+      if (value && typeof value === 'string') {
+        const values = value.split(' ');
         queryConditions.push(
           `${key} IN (${values.map((value) => `'${value}'`).join(', ')})`,
         );
