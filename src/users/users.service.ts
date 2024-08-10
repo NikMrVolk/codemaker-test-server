@@ -4,12 +4,14 @@ import { Cache } from 'cache-manager';
 import { LoginSuccessResponse } from 'src/auth/types';
 import { User, UsersResponse } from './types';
 import { DBService } from './db.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly dbService: DBService,
+    private readonly authService: AuthService,
   ) {}
 
   async getUsers(
@@ -24,15 +26,19 @@ export class UsersService {
     } = {},
     take: number = 10,
     skip: number = 0,
+    accessToken: string,
   ) {
-    const data = await this.cacheManager.get<LoginSuccessResponse>('2');
-    if (data) {
+    const { id } = this.authService.checkToken(accessToken);
+    const userData = await this.cacheManager.get<LoginSuccessResponse>(
+      String(id),
+    );
+    if (userData) {
       const db = await this.dbService.connectToDatabase({
-        host: data.db.host.split(':')[0],
-        port: +data.db.host.split(':')[1],
-        username: data.db.username,
-        password: data.db.pass,
-        database: data.db.database,
+        host: userData.db.host.split(':')[0],
+        port: +userData.db.host.split(':')[1],
+        username: userData.db.username,
+        password: userData.db.pass,
+        database: userData.db.database,
       });
 
       try {

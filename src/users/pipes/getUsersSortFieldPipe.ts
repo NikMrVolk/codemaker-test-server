@@ -23,6 +23,7 @@ export class GetUsersSortFieldPipe implements PipeTransform {
     searchStatus?: string;
     searchCurrency?: string;
     limit?: number;
+    accessToken: string;
   }) {
     const { sortField, sortDirection } = value;
 

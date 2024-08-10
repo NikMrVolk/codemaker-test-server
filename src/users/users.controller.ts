@@ -19,6 +19,7 @@ export class UsersController {
       searchCurrency: string;
       take: number;
       skip: number;
+      accessToken: string;
     },
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -38,6 +39,7 @@ export class UsersController {
       search,
       query.take,
       query.skip,
+      query.accessToken,
     );
 
     if (totalCount) {

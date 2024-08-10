@@ -8,7 +8,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     CacheModule.register({
       isGlobal: true,
-      ttl: 30 * 1000,
+      ttl: 30 * 60 * 1000,
     }),
     AuthModule,
     UsersModule,

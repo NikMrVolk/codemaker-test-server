@@ -47,11 +47,7 @@ export class AuthService {
         userId: user.id,
       });
 
-      await this.cacheManager.set(
-        String(user.id),
-        response.data,
-        30 * 60 * 1000,
-      );
+      await this.cacheManager.set(String(user.id), response.data);
 
       return {
         userData: { ...user, role: 'admin' },
@@ -63,8 +59,13 @@ export class AuthService {
     }
   }
 
-  async getDataFromCache(userId: string) {
-    return this.cacheManager.get(userId);
+  checkToken(accessToken: string) {
+    try {
+      return this.jwt.decode<{ id: number }>(accessToken);
+    } catch (e) {
+      console.error(e);
+      throw new BadRequestException('Invalid token');
+    }
   }
 
   async deleteDataFromCache(userId: string) {
