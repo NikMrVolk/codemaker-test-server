@@ -72,10 +72,13 @@ export class UsersService {
     const queryConditions: string[] = [];
 
     Object.keys(searchQuery).forEach((key) => {
-      const values = searchQuery[key].split(' ');
-      queryConditions.push(
-        `${key} IN (${values.map((value) => `'${value}'`).join(', ')})`,
-      );
+      const value = searchQuery[key];
+      if (value) {
+        const values = searchQuery[key].split(' ');
+        queryConditions.push(
+          `${key} IN (${values.map((value) => `'${value}'`).join(', ')})`,
+        );
+      }
     });
 
     return queryConditions;
