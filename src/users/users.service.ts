@@ -17,7 +17,7 @@ export class UsersService {
   async getUsers(
     sort: { field: keyof User; direction: 'asc' | 'desc' } = {
       field: 'id',
-      direction: 'asc',
+      direction: 'desc',
     },
     searchQuery: {
       group?: string;
@@ -50,7 +50,7 @@ export class UsersService {
         SELECT id, login, \`group\`, status, currency, balance, bonus_balance, date_reg
         FROM users
         ${queryConditionString ? `WHERE ${queryConditionString.replace('group', '`group`')}` : ''}
-        ORDER BY ${sort.field} ${sort.direction}
+        ORDER BY ${sort.field === 'group' ? '`group`' : 'id'} ${sort.direction}
         LIMIT ${limit} OFFSET ${skip}
       `;
 
