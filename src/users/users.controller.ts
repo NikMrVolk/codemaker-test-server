@@ -16,6 +16,7 @@ export class UsersController {
       searchGroup: string;
       searchStatus: string;
       searchCurrency: string;
+      limit: number;
     },
   ) {
     const sort = {

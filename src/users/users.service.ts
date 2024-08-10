@@ -22,6 +22,7 @@ export class UsersService {
       status?: string;
       currency?: string;
     } = {},
+    limit: number = 10,
   ) {
     const data = await this.cacheManager.get<LoginSuccessResponse>('2');
     if (data) {
@@ -33,32 +34,9 @@ export class UsersService {
         database: data.db.database,
       });
 
-      console.log(searchQuery);
-
       try {
-        const queryConditions: string[] = [];
-
-        if (searchQuery.group) {
-          const groupValues = searchQuery.group.split(' ');
-          queryConditions.push(
-            `group IN (${groupValues.map((value) => `'${value}'`).join(', ')})`,
-          );
-        }
-
-        if (searchQuery.status) {
-          const statusValues = searchQuery.status.split(' ');
-          queryConditions.push(
-            `status IN (${statusValues.map((value) => `'${value}'`).join(', ')})`,
-          );
-        }
-
-        if (searchQuery.currency) {
-          const currencyValues = searchQuery.currency.split(' ');
-          queryConditions.push(
-            `currency IN (${currencyValues.map((value) => `'${value}'`).join(', ')})`,
-          );
-        }
-
+        const queryConditions: string[] =
+          this.buildQueryConditions(searchQuery);
         const queryConditionString = queryConditions.join(' AND ');
 
         const querySQL = `
@@ -66,16 +44,19 @@ export class UsersService {
         FROM users
         ${queryConditionString ? `WHERE ${queryConditionString.replace('group', '`group`')}` : ''}
         ORDER BY ${sort.field} ${sort.direction}
-        LIMIT 10
+        ${limit ? `LIMIT ${limit}` : ''}
       `;
 
-        console.log(querySQL);
+        const dataFromCache =
+          await this.cacheManager.get<UsersResponse>(querySQL);
 
-        const users = await db.query<UsersResponse>(querySQL);
-
-        console.log(users);
-
-        return users;
+        if (dataFromCache) {
+          return dataFromCache;
+        } else {
+          const response = await db.query<UsersResponse>(querySQL);
+          await this.cacheManager.set(querySQL, response);
+          return response;
+        }
       } catch (error) {
         console.error(error);
         throw new BadRequestException('DB request error');
@@ -83,5 +64,20 @@ export class UsersService {
     }
 
     throw new BadRequestException('Request error');
+  }
+
+  private buildQueryConditions(searchQuery: {
+    [key: string]: string;
+  }): string[] {
+    const queryConditions: string[] = [];
+
+    Object.keys(searchQuery).forEach((key) => {
+      const values = searchQuery[key].split(' ');
+      queryConditions.push(
+        `${key} IN (${values.map((value) => `'${value}'`).join(', ')})`,
+      );
+    });
+
+    return queryConditions;
   }
 }
