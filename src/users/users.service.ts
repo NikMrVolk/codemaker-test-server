@@ -26,7 +26,6 @@ export class UsersService {
     skip: number = 0,
   ) {
     const data = await this.cacheManager.get<LoginSuccessResponse>('2');
-    console.log(1);
     if (data) {
       const db = await this.dbService.connectToDatabase({
         host: data.db.host.split(':')[0],
@@ -35,13 +34,11 @@ export class UsersService {
         password: data.db.pass,
         database: data.db.database,
       });
-      console.log(2);
 
       try {
         const queryConditions: string[] =
           this.buildQueryConditions(searchQuery);
         const queryConditionString = queryConditions.join(' AND ');
-        console.log(3);
 
         const querySQL = `
         SELECT id, login, \`group\`, status, currency, balance, bonus_balance, date_reg
@@ -50,13 +47,12 @@ export class UsersService {
         ORDER BY ${sort.field} ${sort.direction}
         LIMIT ${take} OFFSET ${skip}
       `;
-        console.log(4, querySQL);
 
         const dataFromCache = await this.cacheManager.get<{
           users: UsersResponse;
           totalCount: number;
         }>(querySQL);
-        console.log(5, dataFromCache);
+
         if (dataFromCache) {
           return dataFromCache;
         } else {
@@ -64,10 +60,9 @@ export class UsersService {
           const totalCount = await db.query(
             `SELECT COUNT(*) FROM users ${queryConditionString ? `WHERE ${queryConditionString.replace('group', '`group`')}` : ''}`,
           );
-          console.log(6, totalCount, users);
+
           const response = { users, totalCount: totalCount[0]['COUNT(*)'] };
           await this.cacheManager.set(querySQL, response);
-          console.log(7, response);
           return response;
         }
       } catch (error) {
