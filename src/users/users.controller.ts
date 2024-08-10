@@ -20,7 +20,7 @@ export class UsersController {
       take: number;
       skip: number;
     },
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
   ) {
     const sort = {
       field: query.sortField || 'id',
