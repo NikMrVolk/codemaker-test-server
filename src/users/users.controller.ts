@@ -30,6 +30,6 @@ export class UsersController {
       currency: query.searchCurrency,
     };
 
-    return this.usersService.getUsers(sort, search);
+    return this.usersService.getUsers(sort, search, query.limit);
   }
 }
