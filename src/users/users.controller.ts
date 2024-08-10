@@ -1,7 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { GetUsersSortFieldPipe } from './pipes/getUsersSortFieldPipe';
 import { User } from './types';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -16,8 +17,10 @@ export class UsersController {
       searchGroup: string;
       searchStatus: string;
       searchCurrency: string;
-      limit: number;
+      take: number;
+      skip: number;
     },
+    @Res() res: Response,
   ) {
     const sort = {
       field: query.sortField || 'id',
@@ -30,6 +33,18 @@ export class UsersController {
       currency: query.searchCurrency,
     };
 
-    return this.usersService.getUsers(sort, search, query.limit);
+    const { users, totalCount } = await this.usersService.getUsers(
+      sort,
+      search,
+      query.take,
+      query.skip,
+    );
+
+    if (totalCount) {
+      res.header('Access-Control-Expose-Headers', 'X-Total-Count');
+      res.header('X-Total-Count', totalCount.toString());
+    }
+
+    return users;
   }
 }

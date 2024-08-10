@@ -22,7 +22,8 @@ export class UsersService {
       status?: string;
       currency?: string;
     } = {},
-    limit: number = 10,
+    take: number = 10,
+    skip: number = 0,
   ) {
     const data = await this.cacheManager.get<LoginSuccessResponse>('2');
     if (data) {
@@ -44,16 +45,23 @@ export class UsersService {
         FROM users
         ${queryConditionString ? `WHERE ${queryConditionString.replace('group', '`group`')}` : ''}
         ORDER BY ${sort.field} ${sort.direction}
-        ${limit ? `LIMIT ${limit}` : ''}
+        LIMIT ${take} OFFSET ${skip}
       `;
 
-        const dataFromCache =
-          await this.cacheManager.get<UsersResponse>(querySQL);
+        const dataFromCache = await this.cacheManager.get<{
+          users: UsersResponse;
+          totalCount: number;
+        }>(querySQL);
 
         if (dataFromCache) {
           return dataFromCache;
         } else {
-          const response = await db.query<UsersResponse>(querySQL);
+          const users = await db.query<UsersResponse>(querySQL);
+          const totalCount = await db.query(
+            `SELECT COUNT(*) FROM users ${queryConditionString ? `WHERE ${queryConditionString.replace('group', '`group`')}` : ''}`,
+          );
+
+          const response = { users, totalCount: totalCount[0]['COUNT(*)'] };
           await this.cacheManager.set(querySQL, response);
           return response;
         }
