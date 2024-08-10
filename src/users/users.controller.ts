@@ -39,11 +39,14 @@ export class UsersController {
       query.take,
       query.skip,
     );
+    console.log(8);
 
     if (totalCount) {
       res.header('Access-Control-Expose-Headers', 'X-Total-Count');
       res.header('X-Total-Count', totalCount.toString());
     }
+
+    console.log(9, users);
 
     return users;
   }
