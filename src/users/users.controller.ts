@@ -17,7 +17,7 @@ export class UsersController {
       searchGroup: string;
       searchStatus: string;
       searchCurrency: string;
-      take: number;
+      limit: number;
       skip: number;
       accessToken: string;
     },
@@ -37,7 +37,7 @@ export class UsersController {
     const { users, totalCount } = await this.usersService.getUsers(
       sort,
       search,
-      query.take,
+      query.limit,
       query.skip,
       query.accessToken,
     );

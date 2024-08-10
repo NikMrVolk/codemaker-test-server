@@ -24,7 +24,7 @@ export class UsersService {
       status?: string;
       currency?: string;
     } = {},
-    take: number = 10,
+    limit: number = 10,
     skip: number = 0,
     accessToken: string,
   ) {
@@ -51,7 +51,7 @@ export class UsersService {
         FROM users
         ${queryConditionString ? `WHERE ${queryConditionString.replace('group', '`group`')}` : ''}
         ORDER BY ${sort.field} ${sort.direction}
-        LIMIT ${take} OFFSET ${skip}
+        LIMIT ${limit} OFFSET ${skip}
       `;
 
         const dataFromCache = await this.cacheManager.get<{
