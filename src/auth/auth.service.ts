@@ -61,7 +61,9 @@ export class AuthService {
 
   checkToken(accessToken: string) {
     try {
-      return this.jwt.decode<{ id: number }>(accessToken);
+      const data = this.jwt.decode<{ id: number }>(accessToken);
+      console.log(data);
+      return data
     } catch (e) {
       console.error(e);
       throw new BadRequestException('Invalid token');
