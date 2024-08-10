@@ -60,10 +60,11 @@ export class AuthService {
   }
 
   checkToken(accessToken: string) {
+    if (!accessToken) {
+      throw new BadRequestException('Invalid token');
+    }
     try {
-      const data = this.jwt.decode<{ id: number }>(accessToken);
-      console.log(data);
-      return data
+      return this.jwt.decode<{ id: number }>(accessToken);
     } catch (e) {
       console.error(e);
       throw new BadRequestException('Invalid token');
